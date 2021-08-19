@@ -7,13 +7,14 @@ code: 0 正常
 code: -1 异常
 """
 
-def json_api_response(code, message, data):
+def json_api_response(code, message, data=None):
     """自定义请求返回格式"""
     return Response({
         "code": code,
         "message": message,
         "data": data
     })
+
 
 
 def jwt_response_payload(token, user=None, request=None):

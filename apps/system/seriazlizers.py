@@ -8,8 +8,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = models.UserProfile
-        exclude = ("password",)
-        fields = "__all__"
+        exclude  = ("password",)
 
 
 class RoleSerializer(ModelSerializer):

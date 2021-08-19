@@ -8,7 +8,7 @@ class UserProfile(AbstractUser):
     """用户表扩展"""
     name = models.CharField(max_length=64, default="", verbose_name="中文姓名")
     phone = models.CharField(max_length=11, default="", verbose_name="手机号码")
-    email = models.EmailField(max_length=64, verbose_name="邮箱")
+    email = models.EmailField(max_length=64, verbose_name="邮箱", null=True, blank=True)
     avator = models.ImageField(upload_to="data/upload/%Y/%m", default="data/upload/default.jpeg", max_length=100,
                                null=True, blank=True)
     position = models.CharField(max_length=64, null=True, blank=True, verbose_name="职位")
