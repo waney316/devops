@@ -2,3 +2,5 @@
 - modelviewset
 - reponse
 - pagination
+- model
+- exceprions

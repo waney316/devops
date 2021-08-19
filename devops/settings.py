@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from config.config import Config
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -135,3 +136,33 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = "system.UserProfile"
+
+# API_VERSION
+API_VERSION = "api/v1"
+
+# REST_FRAMEWORK全局配置
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'EXCEPTION_HANDLER': 'base.exceptions.custom_exception_handler',
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
+}
+
+# REST_FRAMEWORK_JWT全局配置
+
+JWT_AUTH = {
+    # 设置token过期时间为一周
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    # 设置token开头
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    # 不允许刷新token
+    'JWT_ALLOW_REFRESH': False,
+    # 使用自定义token返回
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'base.response.jwt_response_payload',
+}
