@@ -159,7 +159,6 @@ REST_FRAMEWORK = {
 }
 
 # REST_FRAMEWORK_JWT全局配置
-
 JWT_AUTH = {
     # 设置token过期时间为一周
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
