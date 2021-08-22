@@ -28,7 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # jwt token
-    path("jwt-token", obtain_jwt_token),
+    path(f"{settings.API_VERSION}/jwt-token", obtain_jwt_token),
 
     # api docs
     path(f"{settings.API_VERSION}/docs", include_docs_urls(title="devops api", permission_classes=[IsAuthenticated])),

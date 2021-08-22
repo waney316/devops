@@ -1,19 +1,24 @@
 from django.urls import path
 
 from apps.system import views
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+
+router.register(r"user", views.UserModelView)
+router.register(r"role", views.RoleModelView)
+router.register(r"permission", views.PermissionModelView)
+
 
 urlpatterns = [
+    # jwt token 获取用户登录信息
     path("user/info", views.UserInfoView.as_view()),
 
-    # 用户
-    path("user/", views.UserModelView.as_view({"get": "list", "post": "create"})),
-    path("user/<int:pk>", views.UserModelView.as_view({"put": "update", "get": "retrieve", "delete": "destroy"})),
+    # vue生成用户对应菜单树
+    path("menu_tree", views.MenuTreeView.as_view()),
 
-    # 角色
-    path("role/", views.RoleModelView.as_view({"get": "list", "post": "create"})),
-    path("role/<int:pk>", views.RoleModelView.as_view({"put": "update", "get": "retrieve", "delete": "destroy"})),
-
-    # 权限
-    path("permission/", views.PermissionModelView.as_view({"get": "list", "post": "create"})),
-    path("permission/<int:pk>", views.PermissionModelView.as_view({"put": "update", "get": "retrieve", "delete": "destroy"})),
+    # 权限管理菜单树
+    path("permission_tree", views.PermissionTreeView.as_view()),
 ]
+
+urlpatterns = urlpatterns + router.urls

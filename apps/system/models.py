@@ -26,8 +26,9 @@ class UserProfile(AbstractUser):
 
 
 # 角色
-class Role(BaseModel):
+class Role(models.Model):
     name = models.CharField(max_length=64, verbose_name="角色")
+    remarks = models.CharField(max_length=1024, verbose_name="备注信息", null=True, blank=True)
 
     class Meta:
         db_table = "system_role"
@@ -36,7 +37,7 @@ class Role(BaseModel):
         verbose_name_plural = verbose_name
 
 
-class UserRole(BaseModel):
+class UserRole(models.Model):
     """用户和角色关联中间表"""
     user = models.IntegerField(verbose_name="用户ID")
     role = models.IntegerField(verbose_name="角色ID")
@@ -46,13 +47,13 @@ class UserRole(BaseModel):
 
 
 # 权限
-class Permission(BaseModel):
+class Permission(models.Model):
     """映射vue路由菜单"""
     title = models.CharField(max_length=64, default="", verbose_name="标题")
     name = models.CharField(max_length=64, default="", verbose_name="名称")
     alias = models.CharField(max_length=64, default="", verbose_name="别名")
     icon = models.CharField(max_length=64, default="", verbose_name="图标")
-    sort = models.IntegerField(default=0, verbose_name="展示顺序")
+    sort = models.IntegerField(default=0, verbose_name="展示顺序")    # 0->1->2
     parent = models.IntegerField(default=0, verbose_name="菜单层级")   # 0:顶级菜单 1:二级菜单  2:三级菜单
     type = models.IntegerField(default=0, verbose_name="权限类型")    # 1:菜单   2: 标签
     component = models.CharField(max_length=256, default="", verbose_name="组件类型")
@@ -70,7 +71,7 @@ class Permission(BaseModel):
         verbose_name_plural = verbose_name
 
 
-class RolePermission(BaseModel):
+class RolePermission(models.Model):
     """角色权限关联中间表"""
     role = models.IntegerField(verbose_name="角色ID")
     permission = models.IntegerField(verbose_name="权限ID")

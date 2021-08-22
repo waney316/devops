@@ -1,6 +1,7 @@
 from rest_framework.serializers import ModelSerializer
-
+from django.contrib.auth.models import make_password
 from apps.system import models
+
 
 
 class UserSerializer(ModelSerializer):
@@ -19,6 +20,13 @@ class UserSerializer(ModelSerializer):
 
         instance.save()
         return instance
+
+    def create(self, validated_data):
+        password = validated_data.pop("password", None)
+        if password is not None:
+            validated_data["password"] = make_password(password)
+
+        return self.Meta.model.objects.create(**validated_data)
 
 
 class RoleSerializer(ModelSerializer):
