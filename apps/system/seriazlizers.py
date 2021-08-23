@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from django.contrib.auth.models import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from apps.system import models
 
 
@@ -11,7 +11,9 @@ class UserSerializer(ModelSerializer):
         model = models.UserProfile
         # fields = "__all__"
         exclude = ("groups", "user_permissions",)
-        # # extra_kwargs = {'password': {'read_only': True}}
+        extra_kwargs = {
+            'password': {'required': False}
+        }
 
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)

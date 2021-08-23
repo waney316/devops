@@ -25,9 +25,9 @@ class UserProfile(AbstractUser):
 
 
 # 角色
-class Role(models.Model):
+class Role(BaseModel):
     name = models.CharField(max_length=64, verbose_name="角色")
-    remarks = models.CharField(max_length=1024, verbose_name="备注信息", null=True, blank=True)
+
 
     class Meta:
         db_table = "system_role"
