@@ -9,7 +9,9 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = models.UserProfile
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ("groups", "user_permissions",)
+        extra_kwargs = {'password': {'read_only': True}}
 
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
