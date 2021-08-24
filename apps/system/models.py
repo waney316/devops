@@ -27,11 +27,13 @@ class UserProfile(AbstractUser):
 # 角色
 class Role(BaseModel):
     name = models.CharField(max_length=64, verbose_name="角色")
+    key = models.CharField(max_length=64, verbose_name="角色权限标识", default="")
+    sort = models.PositiveSmallIntegerField(verbose_name="显示顺序", default=0)
 
 
     class Meta:
         db_table = "system_role"
-        ordering = ["-id"]
+        ordering = ["sort"]
         verbose_name = "角色信息"
         verbose_name_plural = verbose_name
 

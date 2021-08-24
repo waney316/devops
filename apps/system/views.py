@@ -158,7 +158,7 @@ class RoleModelView(BadeModelViewSet):
     """
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
-    search_fields = ("name",)
+    search_fields = ("name", "key")
 
     def list(self, request, *args, **kwargs):
         """查询角色时获取角色关联权限"""
