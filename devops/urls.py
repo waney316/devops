@@ -31,7 +31,7 @@ urlpatterns = [
     path(f"{settings.API_VERSION}/jwt-token", obtain_jwt_token),
 
     # api docs
-    path(f"{settings.API_VERSION}/docs", include_docs_urls(title="devops api", permission_classes=[IsAuthenticated])),
+    path(f"{settings.API_VERSION}/docs", include_docs_urls(title="devops api", permission_classes=[])),
 
     # system
     path(f'{settings.API_VERSION}/system/', include(system_urls))

@@ -128,29 +128,6 @@ class UserModelView(BadeModelViewSet):
 
         return json_api_response(code=0, message="删除用户信息成功")
 
-    @action(methods=["get"], detail=False, url_path="user_permission", url_name="user_permission")
-    def user_permission(self, request):
-        """获取当前用户页面标签权限"""
-        try:
-            user = UserProfile.objects.get(pk=request.user.id)
-            if user.is_superuser:
-                user_permission = ["*:*:*"]
-            else:
-                # 查询用户关联角色
-                user_roles = [role[0] for role in UserRole.objects.filter(user=user.id).values_list("role")]
-                # 查询角色关联权限
-                permissions = [p[0] for p in
-                               RolePermission.objects.filter(role__in=user_roles).values_list("permission")]
-                # 根据权限id返回菜单数据
-                user_permission = [p[0] for p in list(
-                    Permission.objects.filter(id__in=permissions, type=2).exclude(permission="").values_list(
-                        "permission"))]
-
-        except Exception as e:
-            return json_api_response(code=-1, message=f"查询用户权限失败{e}")
-
-        return json_api_response(code=0, message="查询用户权限成功", data=user_permission)
-
 
 class RoleModelView(BadeModelViewSet):
     """
@@ -184,18 +161,9 @@ class RoleModelView(BadeModelViewSet):
         """更新角色权限"""
         try:
             with transaction.atomic():
-                permissions = request.pop("permission", None)
-                partial = kwargs.pop('partial', False)
+                print(request.data)
+                permissions = request.data.pop("permission", None)
                 instance = self.get_object()
-                serializer = self.get_serializer(instance, data=request.data, partial=partial)
-
-                serializer.is_valid(raise_exception=True)
-                self.perform_update(serializer)
-
-                if getattr(instance, '_prefetched_objects_cache', None):
-                    # If 'prefetch_related' has been applied to a queryset, we need to
-                    # forcibly invalidate the prefetch cache on the instance.
-                    instance._prefetched_objects_cache = {}
 
                 if permissions:
                     RolePermission.objects.filter(permission__in=permissions, role=instance.id).delete()
@@ -204,7 +172,7 @@ class RoleModelView(BadeModelViewSet):
 
         except Exception as e:
             return json_api_response(code=-1, message=f"更新角色权限失败{e}")
-        return json_api_response(code=0, message="更新角色权限成功", data=serializer.data)
+        return json_api_response(code=0, message="更新角色权限成功")
 
 
 class PermissionModelView(BadeModelViewSet):
@@ -257,15 +225,17 @@ class MenuTreeView(APIView):
     def get(self, request, *args, **kwargs):
         user = UserProfile.objects.get(id=request.user.id)
         try:
+
             # 如果用户为管理员,返回全部菜单
             if user.is_superuser:
                 user_permission = list(Permission.objects.filter(type=1, parent=0).order_by("sort").values())
             else:
                 user_roles = [role[0] for role in UserRole.objects.filter(user=user.id).values_list("role")]
-                role_permission = list(set(
+                role_permissions = list(set(
                     [perm[0] for perm in RolePermission.objects.filter(role__in=user_roles).values_list("permission")]))
+                print(role_permissions)
                 user_permission = list(
-                    Permission.objects.filter(id__in=role_permission, type=1, parent=0).order_by("sort").values())
+                    Permission.objects.filter(type=1, parent=0, id__in=role_permissions ).order_by("sort").values())
 
             tree_data = []
             for menu in user_permission:
@@ -276,10 +246,36 @@ class MenuTreeView(APIView):
                     menu_data["children"] = self.recursion_menu(child_menus)
 
                 tree_data.append(menu_data)
+            print(tree_data)
         except Exception as e:
             return json_api_response(code=-1, message=f"生成菜单树失败{e}")
 
         return json_api_response(code=0, message="生成菜单树成功", data=tree_data)
+
+class UserPermission(APIView):
+    """获取当前请求用户的标签权限"""
+    def get(self, request):
+        """获取当前用户页面标签权限"""
+        try:
+            user = UserProfile.objects.get(pk=request.user.id)
+            if user.is_superuser:
+                user_permission = ["*:*:*"]
+            else:
+                # 查询用户关联角色
+                user_roles = [role[0] for role in UserRole.objects.filter(user=user.id).values_list("role")]
+                # 查询角色关联权限
+                permissions = [p[0] for p in
+                               RolePermission.objects.filter(role__in=user_roles).values_list("permission")]
+                # 根据权限id返回菜单数据
+                user_permission = [p[0] for p in list(
+                    Permission.objects.filter(id__in=permissions, type=2).exclude(permission="").values_list(
+                        "permission"))]
+
+        except Exception as e:
+            return json_api_response(code=-1, message=f"查询用户权限失败{e}")
+
+        return json_api_response(code=0, message="查询用户权限成功", data=user_permission)
+
 
 
 class PermissionTreeView(APIView):

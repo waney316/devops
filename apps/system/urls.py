@@ -19,6 +19,9 @@ urlpatterns = [
 
     # 权限管理菜单树
     path("permission_tree", views.PermissionTreeView.as_view()),
+
+    # 请求用户标签权限
+    path("user_permission", views.UserPermission.as_view()),
 ]
 
 urlpatterns = urlpatterns + router.urls
