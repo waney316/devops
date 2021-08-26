@@ -202,7 +202,7 @@ class MenuTreeView(APIView):
             "icon": menu["icon"]
         }
 
-    def recursion_menu(self, childs):
+    def recursion_menu(self, childs, parent_id, role_permissions):
         """
         生成菜单树
         :param id: 父级菜单id
@@ -210,13 +210,16 @@ class MenuTreeView(APIView):
         :return:
         """
         childMenus = []
-        if childs:
+        print(parent_id)
+        print(role_permissions)
+        if role_permissions:
             for child in childs:
                 child_data = self.format_menu(child)
-                _childs = Permission.objects.filter(parent=child["id"], type=1).values()
+                _childs = Permission.objects.filter(parent=parent_id, type=1, id__in=role_permissions).values()
+                print(_childs)
                 if _childs:
                     _childs_data = []
-                    _childs_data.append(self.recursion_menu(_childs))
+                    _childs_data.append(self.recursion_menu(_childs, child["id"], role_permissions))
                     child_data["children"] = _childs_data
                 childMenus.append(child_data)
         return childMenus
@@ -225,7 +228,7 @@ class MenuTreeView(APIView):
     def get(self, request, *args, **kwargs):
         user = UserProfile.objects.get(id=request.user.id)
         try:
-
+            role_permissions = []
             # 如果用户为管理员,返回全部菜单
             if user.is_superuser:
                 user_permission = list(Permission.objects.filter(type=1, parent=0).order_by("sort").values())
@@ -243,14 +246,14 @@ class MenuTreeView(APIView):
                 child_menus = Permission.objects.filter(parent=menu["id"]).values()
                 if child_menus:
                 # 根据权限数据生成vue可识别的格式
-                    menu_data["children"] = self.recursion_menu(child_menus)
+                    menu_data["children"] = self.recursion_menu(child_menus, menu["id"], role_permissions)
 
                 tree_data.append(menu_data)
-            print(tree_data)
         except Exception as e:
             return json_api_response(code=-1, message=f"生成菜单树失败{e}")
 
         return json_api_response(code=0, message="生成菜单树成功", data=tree_data)
+
 
 class UserPermission(APIView):
     """获取当前请求用户的标签权限"""
