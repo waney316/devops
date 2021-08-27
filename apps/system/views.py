@@ -209,19 +209,20 @@ class MenuTreeView(APIView):
         :param menu: 父级菜单
         :return:
         """
-        childMenus = []
-        print(parent_id)
-        print(role_permissions)
-        if role_permissions:
-            for child in childs:
-                child_data = self.format_menu(child)
-                _childs = Permission.objects.filter(parent=parent_id, type=1, id__in=role_permissions).values()
-                print(_childs)
-                if _childs:
-                    _childs_data = []
-                    _childs_data.append(self.recursion_menu(_childs, child["id"], role_permissions))
-                    child_data["children"] = _childs_data
-                childMenus.append(child_data)
+        childMenus = []  # 返回的菜单数据
+
+        for child in childs:
+            # 如果当前节点id不在权限菜单里
+            if child["id"] not in role_permissions:
+                continue
+
+            child_data = self.format_menu(child)
+            _childs = Permission.objects.filter(parent=child["id"], type=1).values() #当前节点是否存在下一集菜单
+            if _childs:
+                _childs_data = []
+                _childs_data.append(self.recursion_menu(_childs, child["id"], role_permissions))
+                child_data["children"] = _childs_data
+            childMenus.append(child_data)
         return childMenus
 
 
@@ -236,7 +237,6 @@ class MenuTreeView(APIView):
                 user_roles = [role[0] for role in UserRole.objects.filter(user=user.id).values_list("role")]
                 role_permissions = list(set(
                     [perm[0] for perm in RolePermission.objects.filter(role__in=user_roles).values_list("permission")]))
-                print(role_permissions)
                 user_permission = list(
                     Permission.objects.filter(type=1, parent=0, id__in=role_permissions ).order_by("sort").values())
 
