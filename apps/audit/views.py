@@ -9,5 +9,6 @@ class AuditLogView(BadeModelViewSet):
     permission_classes = []
     queryset = AuditLogModel.objects.all()
     serializer_class = AuditLogSerializer
-    search_fields = ("uri", )
-    filterset_fields = ("method", "uri")
+    search_fields = ("url", )
+    filterset_fields = ("method", "url")
+

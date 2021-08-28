@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.system.apps.SystemConfig',
+    'apps.audit.apps.AuditConfig',
 
     'rest_framework',
     'rest_framework_jwt',
@@ -51,6 +52,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # custom middleware
+    'middleware.audit.EventAuditMiddleware',
 ]
 
 ROOT_URLCONF = 'devops.urls'

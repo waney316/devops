@@ -1,4 +1,5 @@
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from django.contrib.auth.hashers import make_password, check_password
 from apps.system import models
 
@@ -44,6 +45,11 @@ class RoleSerializer(ModelSerializer):
 class PermissionSerializer(ModelSerializer):
     """权限信息序列化"""
 
+
     class Meta:
         model = models.Permission
         fields = "__all__"
+        ordering = ["id"]
+        extra_kwargs = {
+            'title': {'required': True}
+        }

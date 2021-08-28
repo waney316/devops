@@ -22,6 +22,7 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework.permissions import IsAuthenticated
 
 from apps.system import urls as system_urls
+from apps.audit import urls as audit_urls
 
 
 urlpatterns = [
@@ -34,5 +35,9 @@ urlpatterns = [
     path(f"{settings.API_VERSION}/docs", include_docs_urls(title="devops api", permission_classes=[])),
 
     # system
-    path(f'{settings.API_VERSION}/system/', include(system_urls))
+    path(f'{settings.API_VERSION}/system/', include(system_urls)),
+
+    # audit log
+    # system
+    path(f'{settings.API_VERSION}/audit/', include(audit_urls))
 ]
