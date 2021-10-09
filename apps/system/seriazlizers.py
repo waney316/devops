@@ -4,7 +4,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from apps.system import models
 
 
-
 class UserSerializer(ModelSerializer):
     """用户信息序列化"""
 
@@ -45,7 +44,6 @@ class RoleSerializer(ModelSerializer):
 class PermissionSerializer(ModelSerializer):
     """权限信息序列化"""
 
-
     class Meta:
         model = models.Permission
         fields = "__all__"
@@ -53,3 +51,12 @@ class PermissionSerializer(ModelSerializer):
         extra_kwargs = {
             'title': {'required': True}
         }
+
+
+class MailSerializer(ModelSerializer):
+    """邮件服务器序列化"""
+    class Meta:
+        model = models.MailModel
+        fields = "__all__"
+        ordering = ["i"]
+

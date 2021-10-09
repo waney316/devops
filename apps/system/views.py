@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 from base.views import BadeModelViewSet
 from base.response import json_api_response
 
-from apps.system.models import UserProfile, UserRole, RolePermission, Role, Permission
-from apps.system.seriazlizers import UserSerializer, RoleSerializer, PermissionSerializer
+from apps.system.models import UserProfile, UserRole, RolePermission, Role, Permission, MailModel
+from apps.system.seriazlizers import UserSerializer, RoleSerializer, PermissionSerializer, MailSerializer
 
 
 class UserInfoView(APIView):
@@ -201,7 +201,7 @@ class MenuTreeView(APIView):
             "icon": menu["icon"]
         }
         if menu["component"] != "":
-            vue_menus.update({"component": menu["component"] })
+            vue_menus.update({"component": menu["component"]})
         return vue_menus
 
     def recursion_menu(self, childs, parent_id, role_permissions):
@@ -214,20 +214,20 @@ class MenuTreeView(APIView):
         childMenus = []  # 返回的菜单数据
         # print(role_permissions)
         if role_permissions is not None:
-            childs = Permission.objects.filter(parent=parent_id, id__in=role_permissions, type=1).values().order_by("sort")
+            childs = Permission.objects.filter(parent=parent_id, id__in=role_permissions, type=1).values().order_by(
+                "sort")
         else:
             childs = Permission.objects.filter(parent=parent_id, type=1).values().order_by("sort")
         # print(childs)
         for child in childs:
             child_data = self.format_menu(child)
-            _childs = Permission.objects.filter(parent=child["id"], type=1).values().order_by("sort") #当前节点是否存在下一集菜单
+            _childs = Permission.objects.filter(parent=child["id"], type=1).values().order_by("sort")  # 当前节点是否存在下一集菜单
             if _childs:
                 # _childs_data = []
                 # _childs_data.append(self.recursion_menu(_childs, child["id"], role_permissions))
                 child_data["children"] = self.recursion_menu(_childs, child["id"], role_permissions)
             childMenus.append(child_data)
         return childMenus
-
 
     def get(self, request, *args, **kwargs):
         user = UserProfile.objects.get(id=request.user.id)
@@ -241,14 +241,14 @@ class MenuTreeView(APIView):
                 role_permissions = list(set(
                     [perm[0] for perm in RolePermission.objects.filter(role__in=user_roles).values_list("permission")]))
                 user_permission = list(
-                    Permission.objects.filter(type=1, parent=0, id__in=role_permissions ).order_by("sort").values())
+                    Permission.objects.filter(type=1, parent=0, id__in=role_permissions).order_by("sort").values())
 
             tree_data = []
             for menu in user_permission:
                 menu_data = self.format_menu(menu)
                 child_menus = Permission.objects.filter(parent=menu["id"]).values()
                 if child_menus:
-                # 根据权限数据生成vue可识别的格式
+                    # 根据权限数据生成vue可识别的格式
                     menu_data["children"] = self.recursion_menu(child_menus, menu["id"], role_permissions)
 
                 tree_data.append(menu_data)
@@ -260,6 +260,7 @@ class MenuTreeView(APIView):
 
 class UserPermission(APIView):
     """获取当前请求用户的标签权限"""
+
     def get(self, request):
         """获取当前用户页面标签权限"""
         try:
@@ -281,7 +282,6 @@ class UserPermission(APIView):
             return json_api_response(code=-1, message=f"查询用户权限失败{e}")
 
         return json_api_response(code=0, message="查询用户权限成功", data=user_permission)
-
 
 
 class PermissionTreeView(APIView):
@@ -310,3 +310,9 @@ class PermissionTreeView(APIView):
             return json_api_response(code=-1, message=f"获取权限列表失败{e}")
 
         return json_api_response(code=0, message="获取权限列表成功", data=permission_data)
+
+
+class MailModelView(BadeModelViewSet):
+    """"邮件服务器"""
+    queryset = MailModel.objects.all()
+    serializer_class = MailSerializer

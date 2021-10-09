@@ -78,3 +78,14 @@ class RolePermission(models.Model):
 
     class Meta:
         db_table = "system_role_permission"
+
+
+class MailModel(models.Model):
+    """邮件服务器相关配置"""
+    smtp_host = models.CharField(max_length=128, verbose_name="smtp服务器")
+    smtp_user = models.CharField(max_length=128, verbose_name="smtp用户")
+    smtp_port = models.PositiveIntegerField(default=25, verbose_name="smtp端口")
+    smtp_pass = models.CharField(max_length=512, verbose_name="smtp鉴权密码")
+
+    class Meta:
+        db_table = "system_mail"

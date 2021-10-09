@@ -4,7 +4,6 @@ from django.db import models
 class AuditLogModel(models.Model):
     """API审计日志"""
 
-
     url = models.CharField(max_length=254, db_index=True, verbose_name="URI", help_text='uri')
     method = models.CharField(max_length=20, db_index=True, verbose_name="请求方式", help_text='请求方式')
     query_string = models.CharField(max_length=254, null=True, verbose_name="URL请求参数", help_text='URL请求参数')
